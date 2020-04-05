@@ -38,6 +38,37 @@ from sklearn.linear_model import LinearRegression
 regressor = LinearRegression()
 regressor.fit(X_train, y_train)
 
+#predicting the Test set results
+y_pred = regressor.predict(X_test)
+
+# Building the optimal model
+
+import statsmodels.formula.api as sm
+ #add X0 which is always 1 to let library know that we are always use B0
+X = np.append(arr = np.ones((50, 1)).astype(int), values = X, axis=1)
+# Backward elimination
+X_opt = X[:, [0,1,2,3,4,5]]
+SL = 0.05
+X_modeled = backwardElimination(X_opt, SL)
+
+
+def backwardElimination(x, sl):
+    numVars = len(x[0])
+    for i in range(0, numVars):
+        regressor_OLS = sm.OLS(y, x).fit()
+        maxVar = max(regressor_OLS.pvalues).astype(float)
+        if maxVar > sl:
+            for j in range(0, numVars - i):
+                if (regressor_OLS.pvalues[j].astype(float) == maxVar):
+                    x = np.delete(x, j, 1)
+    regressor_OLS.summary()
+    return x
+
+
+
+
+
+
 
 
 
